@@ -35,3 +35,7 @@ chrome.webNavigation.onCompleted.addListener(() => {
 // "width":676,"windowId":1103564772}
 
 
+
+
+
+// The following is a test to see if data can be passed from the popup window 

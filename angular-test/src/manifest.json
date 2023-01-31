@@ -21,7 +21,9 @@
     "permissions": [
         "activeTab",
         "webNavigation",
-        "tabs"
+        "tabs",
+        "storage",
+        "unlimitedStorage"
     ]
     
 }
