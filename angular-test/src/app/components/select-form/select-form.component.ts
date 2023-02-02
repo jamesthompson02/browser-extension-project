@@ -1,3 +1,4 @@
+import { ThresholdSeverity } from '@angular-devkit/build-angular/src/utils/bundle-calculator';
 import { Component, Input, ChangeDetectorRef, OnInit } from '@angular/core';
 import { FormGroup, FormControl, FormArray } from '@angular/forms';
 
@@ -9,8 +10,9 @@ import { FormGroup, FormControl, FormArray } from '@angular/forms';
 export class SelectFormComponent implements OnInit {
 
   ngOnInit(): void {
-    this.getColorData();
     this.getTabId();
+    this.getColorData();
+    
   }
 
   constructor( private changeDetector: ChangeDetectorRef) {}
@@ -22,6 +24,8 @@ export class SelectFormComponent implements OnInit {
   currentTabId: number = 0;
 
   colors : string[] = ["red", "blue", "green", "yellow"];
+
+  tabIdsAndColorChoices : Array<any> = [{tabId: 3897637563, color: "red"}];
 
   formatColorTextDisplay(color : string) {
     return color[0].toUpperCase() + color.slice(1); 
@@ -46,12 +50,27 @@ export class SelectFormComponent implements OnInit {
   getColorData() {
     chrome.storage.local.get(['color']).then((result) => {
       if (result['color']) {
-        console.log("This is the getColrData method and value currently is " + result['color']);
-        this.reactiveForm = new FormGroup(
-          {
-            color: new FormControl(result['color'])
+        let stringifiedArrayOfData = JSON.stringify(result['color']);
+        let parsedArrayOfData = JSON.parse(stringifiedArrayOfData);
+        this.tabIdsAndColorChoices = parsedArrayOfData;
+        const colorSelected = this.tabIdsAndColorChoices.filter((eachArray) => {
+          if (eachArray.tabId === this.currentTabId) {
+            return eachArray;
           }
-        );
+        })
+        if (colorSelected.length === 0) {
+          this.reactiveForm = new FormGroup(
+            {
+              color: new FormControl(null)
+            }
+          );
+        } else {
+          this.reactiveForm = new FormGroup(
+            {
+              color: new FormControl(colorSelected[0].color)
+            }
+          )
+        }      
       } else {
         console.log("This is the getColrData method and no color has been chosen");
       }
@@ -75,7 +94,11 @@ export class SelectFormComponent implements OnInit {
 
     console.log(this.reactiveForm.value.color);
 
-    chrome.storage.local.set({ 'color': this.reactiveForm.value.color }).then(() => {
+    const newData = [...this.tabIdsAndColorChoices];
+
+    newData.push({tabId: this.currentTabId, color: this.reactiveForm.value.color});
+
+    chrome.storage.local.set({ 'color': newData }).then(() => {
       console.log("Value is set to " + this.reactiveForm.value.color);
     });
 
