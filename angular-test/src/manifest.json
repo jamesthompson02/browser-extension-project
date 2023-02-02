@@ -22,8 +22,7 @@
         "activeTab",
         "webNavigation",
         "tabs",
-        "storage",
-        "unlimitedStorage"
+        "storage"
     ]
     
 }

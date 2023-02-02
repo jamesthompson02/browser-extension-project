@@ -21,6 +21,11 @@ chrome.webNavigation.onCompleted.addListener(() => {
         }
         return null    
     });
+    // Note: chrome.tabs.sendmessage is what you use to send a message from the service worker - or any other part of
+    // the extension to the content script.
+    // If, however, you wish to send a message from the content script to the service worker - you must use
+    // chrome.runtime.sendmessage => make sure you have an onMessage listener added in your service worker to be able
+    // to receive the message and do something with the message.
 }, { url: [{ hostContains: 'youtube.com' }] });
 
 // sample response that this youtube function will send to content script:

@@ -1,4 +1,4 @@
-import { Component, Input, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, ChangeDetectorRef, OnInit } from '@angular/core';
 import { FormGroup, FormControl, FormArray } from '@angular/forms';
 
 @Component({
@@ -6,7 +6,11 @@ import { FormGroup, FormControl, FormArray } from '@angular/forms';
   templateUrl: './select-form.component.html',
   styleUrls: ['./select-form.component.css']
 })
-export class SelectFormComponent {
+export class SelectFormComponent implements OnInit {
+
+  ngOnInit(): void {
+    this.getColorData();
+  }
 
   constructor( private changeDetector: ChangeDetectorRef) {}
 
@@ -36,7 +40,26 @@ export class SelectFormComponent {
     return this.changeDetector.detectChanges();
   }
 
+  getColorData() {
+    chrome.storage.local.get(['color']).then((result) => {
+      if (result['color']) {
+        console.log("This is the getColrData method and value currently is " + result['color']);
+      } else {
+        console.log("This is the getColrData method and no color has been chosen");
+      }
+      
+    });
+  }
+
   onSubmit() {
+
+    console.log(this.reactiveForm.value.color);
+
+    chrome.storage.local.set({ 'color': this.reactiveForm.value.color }).then(() => {
+      console.log("Value is set to " + this.reactiveForm.value.color);
+    });
+
+
     chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
       if (tabs[0].id) {
         chrome.tabs.sendMessage(tabs[0].id, JSON.stringify(this.reactiveForm.value));
