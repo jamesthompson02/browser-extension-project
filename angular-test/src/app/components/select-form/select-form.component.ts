@@ -44,6 +44,11 @@ export class SelectFormComponent implements OnInit {
     chrome.storage.local.get(['color']).then((result) => {
       if (result['color']) {
         console.log("This is the getColrData method and value currently is " + result['color']);
+        this.reactiveForm = new FormGroup(
+          {
+            color: new FormControl(result['color'])
+          }
+        );
       } else {
         console.log("This is the getColrData method and no color has been chosen");
       }
