@@ -70,6 +70,7 @@ export class SelectFormComponent implements OnInit {
               color: new FormControl(colorSelected[0].color)
             }
           )
+          chrome.tabs.sendMessage(this.currentTabId, JSON.stringify(colorSelected[0]))
         }    
         console.log(JSON.stringify(result['color']));  
       } else {
