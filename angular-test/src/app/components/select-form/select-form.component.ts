@@ -93,9 +93,11 @@ export class SelectFormComponent implements OnInit {
 
   onSubmit() {
 
-    console.log(this.reactiveForm.value.color);
-
-    const newData = [...this.tabIdsAndColorChoices];
+    const newData = this.tabIdsAndColorChoices.filter((eachObject: any) => {
+        if (eachObject.tabId !== this.currentTabId) {
+          return eachObject
+        }
+    });
 
     newData.push({tabId: this.currentTabId, color: this.reactiveForm.value.color});
 
