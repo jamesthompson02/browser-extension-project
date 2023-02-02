@@ -25,7 +25,7 @@ export class SelectFormComponent implements OnInit {
 
   colors : string[] = ["red", "blue", "green", "yellow"];
 
-  tabIdsAndColorChoices : Array<any> = [{tabId: 3897637563, color: "red"}];
+  tabIdsAndColorChoices : Array<any> = [];
 
   formatColorTextDisplay(color : string) {
     return color[0].toUpperCase() + color.slice(1); 
@@ -70,7 +70,8 @@ export class SelectFormComponent implements OnInit {
               color: new FormControl(colorSelected[0].color)
             }
           )
-        }      
+        }    
+        console.log(JSON.stringify(result['color']));  
       } else {
         console.log("This is the getColrData method and no color has been chosen");
       }

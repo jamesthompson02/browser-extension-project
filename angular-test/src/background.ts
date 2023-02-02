@@ -40,7 +40,29 @@ chrome.webNavigation.onCompleted.addListener(() => {
 // "width":676,"windowId":1103564772}
 
 
-
-
-
-// The following is a test to see if data can be passed from the popup window 
+chrome.tabs.onRemoved.addListener((tabId) => {
+  chrome.storage.local.get(['color'])
+  .then((result) => {
+      if( result['color']) {
+        let stringifiedArrayOfData = JSON.stringify(result['color']);
+        let parsedArrayOfData = JSON.parse(stringifiedArrayOfData);
+        const tabData = parsedArrayOfData.filter((eachObject: any) => {
+          if (eachObject.tabId === tabId) {
+            return eachObject;
+          }
+        })
+        if (tabData.length === 1) {
+          const modifiedColorData = parsedArrayOfData.filter((eachObject : any) => {
+            if (eachObject.tabId !== tabId) {
+              return eachObject
+            }
+          })
+          chrome.storage.local.set({ 'color': modifiedColorData });
+        } else {
+          return 
+        }
+      } else {
+        return
+      }
+  })
+})
