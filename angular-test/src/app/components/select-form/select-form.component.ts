@@ -10,6 +10,7 @@ export class SelectFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.getColorData();
+    this.getTabId();
   }
 
   constructor( private changeDetector: ChangeDetectorRef) {}
@@ -17,6 +18,8 @@ export class SelectFormComponent implements OnInit {
   @Input() title : string = "";
 
   formSubmittedMessage : boolean = false;
+
+  currentTabId: number = 0;
 
   colors : string[] = ["red", "blue", "green", "yellow"];
 
@@ -54,6 +57,18 @@ export class SelectFormComponent implements OnInit {
       }
       
     });
+  }
+
+  getTabId() {
+    chrome.tabs.query({ active: true, currentWindow: true})
+    .then((tabs) => {
+      if(tabs[0].id) {
+        return this.currentTabId = tabs[0].id;
+      }
+      return null
+    }).then((result) => {
+      console.log("this is the current Tab Id: ", this.currentTabId);
+    })
   }
 
   onSubmit() {
