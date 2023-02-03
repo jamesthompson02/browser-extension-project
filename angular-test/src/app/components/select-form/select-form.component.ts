@@ -145,38 +145,6 @@ export class SelectFormComponent implements OnInit {
 
     }
 
-    
-
-    // if (dataRelatedToCurrentTabId.length === 1) {
-    //   console.log("ghis is the datarelatedtocurrenttabid: ", dataRelatedToCurrentTabId[0]);
-    //   const removePreExistingColorAndURLDataForThisTabId = dataRelatedToCurrentTabId[0].data.filter((eachColorAndURLEntry: any) => {
-    //       if (eachColorAndURLEntry.url !== this.currentURL) {
-    //         return eachColorAndURLEntry;
-    //       }
-    //   })
-    //   console.log("this is first time remoepreexisting is logged:", removePreExistingColorAndURLDataForThisTabId);
-    //   removePreExistingColorAndURLDataForThisTabId.push({color: this.reactiveForm.value.color, url: this.currentURL});
-    //   console.log("this is second time remoepreexisting is logged:", removePreExistingColorAndURLDataForThisTabId);
-    //   dataRelatedToCurrentTabId[0]['data'] = removePreExistingColorAndURLDataForThisTabId;
-
-
-
-    // } else {
-    //   const copyOfTabIdsAndColorChoices = [...this.tabIdsAndColorChoices];
-    //   copyOfTabIdsAndColorChoices.push({tabId: this.currentTabId, data: [{color: this.reactiveForm.value.color, url: this.currentURL}]});
-    //   chrome.storage.local.set({'color': copyOfTabIdsAndColorChoices});
-
-    // }
-
-    // newData.push({tabId: this.currentTabId, color: this.reactiveForm.value.color, url: this.currentURL});
-
-    // newData.push({tabId: this.currentTabID, data: [{color: this.reactiveForm.value.color, url: this.currentURL}]})
-
-    // chrome.storage.local.set({ 'color': newData }).then(() => {
-    //   console.log("Value is set to " + this.reactiveForm.value.color);
-    // });
-
-
     chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
       if (tabs[0].id) {
         console.log("chrome.tabs.query works");
