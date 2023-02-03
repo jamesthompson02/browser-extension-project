@@ -10,7 +10,7 @@ import { FormGroup, FormControl, FormArray } from '@angular/forms';
 export class SelectFormComponent implements OnInit {
 
   ngOnInit(): void {
-    this.getTabId();
+    this.getTabIdAndUrl();
     this.getColorData();
     
   }
@@ -22,6 +22,8 @@ export class SelectFormComponent implements OnInit {
   formSubmittedMessage : boolean = false;
 
   currentTabId: number = 0;
+
+  currentURL : string = '';
 
   colors : string[] = ["red", "blue", "green", "yellow"];
 
@@ -48,14 +50,15 @@ export class SelectFormComponent implements OnInit {
   }
 
   getColorData() {
+    console.log("getColorData method has been fired")
     chrome.storage.local.get(['color']).then((result) => {
       if (result['color']) {
         let stringifiedArrayOfData = JSON.stringify(result['color']);
         let parsedArrayOfData = JSON.parse(stringifiedArrayOfData);
         this.tabIdsAndColorChoices = parsedArrayOfData;
-        const colorSelected = this.tabIdsAndColorChoices.filter((eachArray) => {
-          if (eachArray.tabId === this.currentTabId) {
-            return eachArray;
+        const colorSelected = this.tabIdsAndColorChoices.filter((eachObject) => {
+          if (eachObject.tabId === this.currentTabId) {
+            return eachObject;
           }
         })
         if (colorSelected.length === 0) {
@@ -65,55 +68,125 @@ export class SelectFormComponent implements OnInit {
             }
           );
         } else {
-          this.reactiveForm = new FormGroup(
-            {
-              color: new FormControl(colorSelected[0].color)
+            const colorAndURLDataForSpecificTabId = colorSelected[0].data.filter((eachObject: any) => {
+              if (eachObject.url === this.currentURL) {
+                return eachObject;
+              }
+            })
+            if (colorAndURLDataForSpecificTabId.length > 0) {
+              this.reactiveForm = new FormGroup(
+                {
+                  color: new FormControl(colorAndURLDataForSpecificTabId[0].color)
+                }
+              )
+              chrome.tabs.sendMessage(this.currentTabId, JSON.stringify(colorAndURLDataForSpecificTabId[0]))
+            } else {
+              this.reactiveForm = new FormGroup(
+                {
+                  color: new FormControl(null)
+                }
+              )
             }
-          )
-          chrome.tabs.sendMessage(this.currentTabId, JSON.stringify(colorSelected[0]))
         }    
-        console.log(JSON.stringify(result['color']));  
       } else {
-        console.log("This is the getColrData method and no color has been chosen");
+        console.log("This is the getColrData method and no data has been set in chrome storage");
       }
       
     });
   }
 
-  getTabId() {
+  getTabIdAndUrl() {
     chrome.tabs.query({ active: true, currentWindow: true})
     .then((tabs) => {
-      if(tabs[0].id) {
-        return this.currentTabId = tabs[0].id;
+      if(tabs[0].id && tabs[0].url) {
+        this.currentTabId = tabs[0].id;
+        return this.currentURL = tabs[0].url;
       }
       return null
-    }).then((result) => {
+    }).then(() => {
       console.log("this is the current Tab Id: ", this.currentTabId);
     })
   }
 
   onSubmit() {
 
-    const newData = this.tabIdsAndColorChoices.filter((eachObject: any) => {
-        if (eachObject.tabId !== this.currentTabId) {
-          return eachObject
-        }
-    });
+    console.log('this is the tabIdsAndColorchoices variable in the onsubmit', this.tabIdsAndColorChoices);
 
-    newData.push({tabId: this.currentTabId, color: this.reactiveForm.value.color});
+    const dataRelatedToCurrentTabId = this.tabIdsAndColorChoices.filter((eachObject: any) => {
+      if (eachObject.tabId === this.currentTabId) {
+        return eachObject;
+      }
+    })
 
-    chrome.storage.local.set({ 'color': newData }).then(() => {
-      console.log("Value is set to " + this.reactiveForm.value.color);
-    });
+    const dataRelatedToAllOtherTabs = this.tabIdsAndColorChoices.filter((eachObject: any) => {
+      if (eachObject.tabId !== this.currentTabId) {
+        return eachObject;
+      }
+    })
+
+    const newData = {tabId: this.currentTabId, data: [{color: this.reactiveForm.value.color, url: this.currentURL}]};
+
+    if (dataRelatedToCurrentTabId.length === 1) {
+      const removePreExistingColorAndURLDataForThisTabId = dataRelatedToCurrentTabId[0].data.filter((eachColorAndURLEntry: any) => {
+              if (eachColorAndURLEntry.url !== this.currentURL) {
+                return eachColorAndURLEntry;
+              }
+      });
+      removePreExistingColorAndURLDataForThisTabId.push({color: this.reactiveForm.value.color, url: this.currentURL});
+      dataRelatedToAllOtherTabs.push({tabId: this.currentTabId, data: removePreExistingColorAndURLDataForThisTabId});
+      this.tabIdsAndColorChoices = dataRelatedToAllOtherTabs;
+      console.log("this is the new tabIds variable in the onsubmit: ", this.tabIdsAndColorChoices);
+      chrome.storage.local.set({'color': this.tabIdsAndColorChoices });
+
+    } else {
+      console.log("there is NO data saved with the current tab id");
+      this.tabIdsAndColorChoices.push(newData)
+      chrome.storage.local.set({'color': this.tabIdsAndColorChoices });
+
+    }
+
+    
+
+    // if (dataRelatedToCurrentTabId.length === 1) {
+    //   console.log("ghis is the datarelatedtocurrenttabid: ", dataRelatedToCurrentTabId[0]);
+    //   const removePreExistingColorAndURLDataForThisTabId = dataRelatedToCurrentTabId[0].data.filter((eachColorAndURLEntry: any) => {
+    //       if (eachColorAndURLEntry.url !== this.currentURL) {
+    //         return eachColorAndURLEntry;
+    //       }
+    //   })
+    //   console.log("this is first time remoepreexisting is logged:", removePreExistingColorAndURLDataForThisTabId);
+    //   removePreExistingColorAndURLDataForThisTabId.push({color: this.reactiveForm.value.color, url: this.currentURL});
+    //   console.log("this is second time remoepreexisting is logged:", removePreExistingColorAndURLDataForThisTabId);
+    //   dataRelatedToCurrentTabId[0]['data'] = removePreExistingColorAndURLDataForThisTabId;
+
+
+
+    // } else {
+    //   const copyOfTabIdsAndColorChoices = [...this.tabIdsAndColorChoices];
+    //   copyOfTabIdsAndColorChoices.push({tabId: this.currentTabId, data: [{color: this.reactiveForm.value.color, url: this.currentURL}]});
+    //   chrome.storage.local.set({'color': copyOfTabIdsAndColorChoices});
+
+    // }
+
+    // newData.push({tabId: this.currentTabId, color: this.reactiveForm.value.color, url: this.currentURL});
+
+    // newData.push({tabId: this.currentTabID, data: [{color: this.reactiveForm.value.color, url: this.currentURL}]})
+
+    // chrome.storage.local.set({ 'color': newData }).then(() => {
+    //   console.log("Value is set to " + this.reactiveForm.value.color);
+    // });
 
 
     chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
       if (tabs[0].id) {
+        console.log("chrome.tabs.query works");
         chrome.tabs.sendMessage(tabs[0].id, JSON.stringify(this.reactiveForm.value));
         this.showDisplayOfSubmittedMessage();
         return setTimeout(this.removeDisplayOfSubmittedMessage.bind(this), 1500);
-      }
-      return null
+      } 
+      return console.log("chrome.tabs.query not working ");
+      
+      
     })
   }
 

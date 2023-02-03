@@ -7,6 +7,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     const parsedMessage = JSON.parse(message);
     console.log('message', message);
     console.log('sender', sender);
+    console.log("this is parsedMessage: ", parsedMessage);
     if (parsedMessage.color && colors.includes(parsedMessage.color)) {
         const body = document.body;
         return body.style.backgroundColor = parsedMessage.color;

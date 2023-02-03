@@ -66,3 +66,7 @@ chrome.tabs.onRemoved.addListener((tabId) => {
       }
   })
 })
+
+// chrome.webNavigation.onCommitted.addListener((result) => {
+//   console.log(result.transitionType, result.url);
+// })
