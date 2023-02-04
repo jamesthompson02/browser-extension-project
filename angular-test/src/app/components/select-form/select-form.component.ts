@@ -1,4 +1,3 @@
-import { ThresholdSeverity } from '@angular-devkit/build-angular/src/utils/bundle-calculator';
 import { Component, Input, ChangeDetectorRef, OnInit } from '@angular/core';
 import { FormGroup, FormControl, FormArray } from '@angular/forms';
 
@@ -79,7 +78,7 @@ export class SelectFormComponent implements OnInit {
                   color: new FormControl(colorAndURLDataForSpecificTabId[0].color)
                 }
               )
-              chrome.tabs.sendMessage(this.currentTabId, JSON.stringify(colorAndURLDataForSpecificTabId[0]))
+              // chrome.tabs.sendMessage(this.currentTabId, JSON.stringify(colorAndURLDataForSpecificTabId[0]))
             } else {
               this.reactiveForm = new FormGroup(
                 {

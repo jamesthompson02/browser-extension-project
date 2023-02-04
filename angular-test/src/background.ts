@@ -67,6 +67,38 @@ chrome.tabs.onRemoved.addListener((tabId) => {
   })
 })
 
+chrome.webNavigation.onCompleted.addListener(({url: url, tabId: tabId}) => {
+  chrome.storage.local.get(['color'])
+  .then((result) => {
+    if (result['color'].length > 0) {
+      const currentTabIdData = result['color'].filter((eachObject : any) => {
+         if (eachObject.tabId === tabId) {
+          return eachObject
+         }
+      })
+      if (currentTabIdData.length === 1) {
+        const urlData = currentTabIdData[0].data.filter((eachObject: any) => {
+          if (eachObject.url === url) {
+            return eachObject;
+          }
+        })
+        if (urlData.length === 1) {
+          chrome.tabs.sendMessage(tabId, JSON.stringify(urlData[0]));
+
+
+        } else {
+          return
+        }
+
+      } else {
+        return
+      }
+    } else {
+      return
+    }
+  })
+})
+
 // chrome.webNavigation.onCommitted.addListener((result) => {
 //   console.log(result.transitionType, result.url);
 // })
