@@ -5,12 +5,12 @@ console.log("chrome extension content script is firing");
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     const colors: string[] = ["red", "blue", "green", "yellow"]
     const parsedMessage = JSON.parse(message);
-    console.log('message', message);
-    console.log('sender', sender);
-    console.log("this is parsedMessage: ", parsedMessage);
+    console.log(parsedMessage);
     if (parsedMessage.color && colors.includes(parsedMessage.color)) {
         const body = document.body;
         return body.style.backgroundColor = parsedMessage.color;
+    } else if (parsedMessage === "Request Icon") {
+        console.log("else if worked");
     }
     return true
 })

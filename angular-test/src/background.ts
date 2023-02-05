@@ -71,6 +71,7 @@ chrome.webNavigation.onCompleted.addListener(({url: url, tabId: tabId}) => {
   chrome.storage.local.get(['color'])
   .then((result) => {
     if (result['color'].length > 0) {
+      console.log(result['color']);
       const currentTabIdData = result['color'].filter((eachObject : any) => {
          if (eachObject.tabId === tabId) {
           return eachObject
@@ -84,8 +85,10 @@ chrome.webNavigation.onCompleted.addListener(({url: url, tabId: tabId}) => {
         })
         if (urlData.length === 1) {
           chrome.tabs.sendMessage(tabId, JSON.stringify(urlData[0]));
-
-
+          chrome.tabs.sendMessage(tabId, JSON.stringify("Request Icon"));
+          drawImage('icon32.png');
+          
+          
         } else {
           return
         }
@@ -98,6 +101,34 @@ chrome.webNavigation.onCompleted.addListener(({url: url, tabId: tabId}) => {
     }
   })
 })
+
+const fetchImage = async (url: string) => {
+  const img = await fetch(url);
+  const blob = await img.blob();
+  console.log(blob);
+  return blob
+}
+
+const getIconImage = async (url: string) => {
+  const imgBlob = await fetchImage(url);
+  const newBitMapImage = await createImageBitmap(imgBlob);
+  console.log("this is new bitmap image: ", newBitMapImage);
+  return newBitMapImage;
+}
+
+const drawImage = async (url:string) => {
+  const offCanvas = new OffscreenCanvas(32,32);
+  const newBitMapImage = await getIconImage(url);
+  const context = offCanvas.getContext('2d');
+  context!.drawImage(newBitMapImage, 0, 0, 32, 32);
+  const imgData : any = context?.getImageData(0,0,32,32);
+  console.log(imgData.data);
+  return imgData
+
+}
+
+
+// chrome.tabs.onUpdated.addListener()
 
 // chrome.webNavigation.onCommitted.addListener((result) => {
 //   console.log(result.transitionType, result.url);

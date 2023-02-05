@@ -3,7 +3,7 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "./out-tsc/app",
-    "types": ["chrome"]
+    "types": ["chrome", "offscreencanvas"]
   },
   "files": [
     "src/main.ts",
