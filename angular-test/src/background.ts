@@ -86,7 +86,7 @@ chrome.webNavigation.onCompleted.addListener(({url: url, tabId: tabId}) => {
         if (urlData.length === 1) {
           chrome.tabs.sendMessage(tabId, JSON.stringify(urlData[0]));
           chrome.tabs.sendMessage(tabId, JSON.stringify("Request Icon"));
-          drawImage('icon32.png');
+          drawImage('red');
           
           
         } else {
@@ -102,33 +102,56 @@ chrome.webNavigation.onCompleted.addListener(({url: url, tabId: tabId}) => {
   })
 })
 
-const fetchImage = async (url: string) => {
-  const img = await fetch(url);
+const fetchImage = async () => {
+  const img = await fetch('icon32.png');
   const blob = await img.blob();
   console.log(blob);
   return blob
 }
 
-const getIconImage = async (url: string) => {
-  const imgBlob = await fetchImage(url);
+const getIconImage = async () => {
+  const imgBlob = await fetchImage();
   const newBitMapImage = await createImageBitmap(imgBlob);
   console.log("this is new bitmap image: ", newBitMapImage);
   return newBitMapImage;
 }
 
-const drawImage = async (url:string) => {
+const drawImage = async ( color : string) => {
   const offCanvas = new OffscreenCanvas(32,32);
-  const newBitMapImage = await getIconImage(url);
+  const newBitMapImage = await getIconImage();
   const context = offCanvas.getContext('2d');
   context!.drawImage(newBitMapImage, 0, 0, 32, 32);
   const imgData : any = context?.getImageData(0,0,32,32);
   console.log(imgData.data);
-  return imgData
+  for (let i = 0; i < imgData.data.length; i += 4) {
+    const total = imgData.data[i] + imgData.data[i+1] + imgData.data[i+2];
+    if (total > 400) {
+      imgData.data[i] = 0
+      imgData.data[i+1] = 0
+      imgData.data[i+2] = 0
+      imgData.data[i+3] = 0
+    } else {
+      imgData.data[i] = 255
+      imgData.data[i+1] = 0
+      imgData.data[i+2] = 0
+      
+
+    }
+  }
+  return chrome.action.setIcon({imageData: imgData})
 
 }
 
 
-// chrome.tabs.onUpdated.addListener()
+chrome.tabs.onUpdated.addListener(( tabId, changeInfo, tab ) => {
+  chrome.tabs.query({
+    active: true, currentWindow: true
+  }, (tabs) => {
+    
+  })
+  
+
+})
 
 // chrome.webNavigation.onCommitted.addListener((result) => {
 //   console.log(result.transitionType, result.url);
