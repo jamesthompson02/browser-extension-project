@@ -86,18 +86,18 @@ chrome.webNavigation.onCompleted.addListener(({url: url, tabId: tabId}) => {
         if (urlData.length === 1) {
           chrome.tabs.sendMessage(tabId, JSON.stringify(urlData[0]));
           chrome.tabs.sendMessage(tabId, JSON.stringify("Request Icon"));
-          drawImage('red');
+          drawImage(urlData[0].color);
           
           
         } else {
-          return
+          return chrome.action.setIcon({path: "./icon32.png"});
         }
 
       } else {
-        return
+        return chrome.action.setIcon({path: "./icon32.png"});
       }
     } else {
-      return
+      return chrome.action.setIcon({path: "./icon32.png"});
     }
   })
 })
@@ -105,14 +105,12 @@ chrome.webNavigation.onCompleted.addListener(({url: url, tabId: tabId}) => {
 const fetchImage = async () => {
   const img = await fetch('icon32.png');
   const blob = await img.blob();
-  console.log(blob);
   return blob
 }
 
 const getIconImage = async () => {
   const imgBlob = await fetchImage();
   const newBitMapImage = await createImageBitmap(imgBlob);
-  console.log("this is new bitmap image: ", newBitMapImage);
   return newBitMapImage;
 }
 
@@ -123,22 +121,63 @@ const drawImage = async ( color : string) => {
   context!.drawImage(newBitMapImage, 0, 0, 32, 32);
   const imgData : any = context?.getImageData(0,0,32,32);
   console.log(imgData.data);
-  for (let i = 0; i < imgData.data.length; i += 4) {
-    const total = imgData.data[i] + imgData.data[i+1] + imgData.data[i+2];
-    if (total > 400) {
-      imgData.data[i] = 0
-      imgData.data[i+1] = 0
-      imgData.data[i+2] = 0
-      imgData.data[i+3] = 0
-    } else {
-      imgData.data[i] = 255
-      imgData.data[i+1] = 0
-      imgData.data[i+2] = 0
-      
-
+  if (color === "red") {
+    for (let i = 0; i < imgData.data.length; i += 4) {
+      const total = imgData.data[i] + imgData.data[i+1] + imgData.data[i+2];
+      if (total > 400) {
+        imgData.data[i] = 0
+        imgData.data[i+1] = 0
+        imgData.data[i+2] = 0
+        imgData.data[i+3] = 0
+      } else {
+        imgData.data[i] = 255
+        imgData.data[i+1] = 0
+        imgData.data[i+2] = 0
+        
+  
+      }
     }
+    return chrome.action.setIcon({imageData: imgData})
+
+  } else if (color === "blue") {
+    for (let i = 0; i < imgData.data.length; i += 4) {
+      const total = imgData.data[i] + imgData.data[i+1] + imgData.data[i+2];
+      if (total > 400) {
+        imgData.data[i] = 0
+        imgData.data[i+1] = 0
+        imgData.data[i+2] = 0
+        imgData.data[i+3] = 0
+      } else {
+        imgData.data[i] = 0
+        imgData.data[i+1] = 0
+        imgData.data[i+2] = 255
+        
+  
+      }
+    }
+    return chrome.action.setIcon({imageData: imgData})
+
+  } else if (color === "green") {
+    return chrome.action.setIcon({path: "./icon32.png"})
+  } else if (color === "yellow") {
+    for (let i = 0; i < imgData.data.length; i += 4) {
+      const total = imgData.data[i] + imgData.data[i+1] + imgData.data[i+2];
+      if (total > 400) {
+        imgData.data[i] = 0
+        imgData.data[i+1] = 0
+        imgData.data[i+2] = 0
+        imgData.data[i+3] = 0
+      } else {
+        imgData.data[i] = 255
+        imgData.data[i+1] = 255
+        imgData.data[i+2] = 0
+        
+  
+      }
+    }
+    return chrome.action.setIcon({imageData: imgData})
   }
-  return chrome.action.setIcon({imageData: imgData})
+  
 
 }
 
@@ -147,11 +186,46 @@ chrome.tabs.onUpdated.addListener(( tabId, changeInfo, tab ) => {
   chrome.tabs.query({
     active: true, currentWindow: true
   }, (tabs) => {
-    
-  })
+    chrome.storage.local.get(['color'])
+  .then((result) => {
+    console.log("this is the chrome.tabs.onupdated with the tabId: ", tabs[0].id);
+    console.log("this is the chrome.tabs.onupdated with the url:  ", tabs[0].url);
+    // if (result['color'].length > 0) {
+    //   const currentTabIdData = result['color'].filter((eachObject : any) => {
+    //     if (eachObject.tabId === tabs[0].id) {
+    //      return eachObject
+    //     }
+    //   })
+    //   if (currentTabIdData.length === 1) {
+    //     const urlData = currentTabIdData[0].data.filter((eachObject: any) => {
+    //       if (eachObject.url === tabs[0].url) {
+    //         return eachObject;
+    //       }
+    //     })
+    //     if (urlData.length === 1) {
+    //       chrome.tabs.sendMessage(tabId, JSON.stringify(urlData[0]));
+    //       chrome.tabs.sendMessage(tabId, JSON.stringify("Request Icon"));
+    //       drawImage(urlData[0].color);
+          
+          
+    //     } else {
+    //       return chrome.action.setIcon({path: "./icon32.png"});
+    //     }
+
+        
+    //   } else {
+    //     return chrome.action.setIcon({path: './icon32.png'})
+
+    //   }
+
+    // } else {
+    //   return chrome.action.setIcon({path: './icon32.png'})
+    // }
+
+  } )
   
 
-})
+})})
 
 // chrome.webNavigation.onCommitted.addListener((result) => {
 //   console.log(result.transitionType, result.url);
