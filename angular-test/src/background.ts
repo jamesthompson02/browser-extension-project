@@ -1,12 +1,12 @@
-chrome.runtime.onInstalled.addListener(() => {
-    chrome.webNavigation.onCompleted.addListener(() => {
-      chrome.tabs.query({ active: true, currentWindow: true }, ([{ id }]) => {
-        if (id) {
-          chrome.action.disable(id);
-        }
-      });
-    }, { url: [{ hostContains: 'google.com' }] });
-  });
+// chrome.runtime.onInstalled.addListener(() => {
+//     chrome.webNavigation.onCompleted.addListener(() => {
+//       chrome.tabs.query({ active: true, currentWindow: true }, ([{ id }]) => {
+//         if (id) {
+//           chrome.action.disable(id);
+//         }
+//       });
+//     }, { url: [{ hostContains: 'google.com' }] });
+//   });
 
 
 // this youtube function basically does the following:
@@ -228,6 +228,4 @@ chrome.tabs.onActivated.addListener(( activeInfo ) => {
 
 })})
 
-// chrome.webNavigation.onCommitted.addListener((result) => {
-//   console.log(result.transitionType, result.url);
-// })
+

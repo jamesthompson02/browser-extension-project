@@ -9,6 +9,7 @@ import { HomePageComponent } from './pages/home-page/home-page.component';
 import { HeaderComponent } from './components/header/header.component';
 import { SubHeaderComponent } from './components/sub-header/sub-header.component';
 import { ReactiveFormsModule } from '@angular/forms';
+import { TestPageComponent } from './pages/test-page/test-page.component';
 
 @NgModule({
   declarations: [
@@ -17,7 +18,8 @@ import { ReactiveFormsModule } from '@angular/forms';
     BtnComponent,
     HomePageComponent,
     HeaderComponent,
-    SubHeaderComponent
+    SubHeaderComponent,
+    TestPageComponent
   ],
   imports: [
     BrowserModule,
