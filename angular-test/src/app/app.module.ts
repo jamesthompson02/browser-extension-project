@@ -10,6 +10,7 @@ import { HeaderComponent } from './components/header/header.component';
 import { SubHeaderComponent } from './components/sub-header/sub-header.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { TestPageComponent } from './pages/test-page/test-page.component';
+import { TabPageComponent } from './pages/tab-page/tab-page.component';
 
 @NgModule({
   declarations: [
@@ -19,7 +20,8 @@ import { TestPageComponent } from './pages/test-page/test-page.component';
     HomePageComponent,
     HeaderComponent,
     SubHeaderComponent,
-    TestPageComponent
+    TestPageComponent,
+    TabPageComponent
   ],
   imports: [
     BrowserModule,
