@@ -232,7 +232,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.createTab) {
     console.log(message.createTab);
     chrome.tabs.create({
-      url: 'assets/tab-page/tab-page.component.html'
+      url: chrome.runtime.getURL('assets/tab-page/tab-page.component.html')
     })
   } else {
     return
